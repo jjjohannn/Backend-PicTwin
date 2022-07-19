@@ -1,0 +1,150 @@
+@startuml
+
+package cl.ucn.disc.pictwin.backend.model {
+left to right direction
+entity Pic {
+-id: Long
+-timestamp: ZoneDataTime
+-dislike: Integer
+-latitude: Double
+-longitude: Double
+-error: Double
+-views: Integer
+-name:String
++Pic: ()
++getId():Long
++getTimestamp(): ZonedDataTime
++getDislikes():Integer
++incrementDislikes():Integer
++getLatitude():Double
++getLongitude():Double
++getError():Double
++getViews():Integer
++incrementViews():Integer
++getName():String
++getPicture():byte[]
++getOwner(): User
+
+}
+
+entity User{
+-id: Long
+-email: String
+-password: String
+-strikes: Integer
+-active: boolean
++User(...)
++getId():Long
++getEmail():String
++getStrikes():Integer
++incrementStrikes():Integer
++getState():State
++getTwins(): List<Twin>
+}
+
+entity Twin{
+-Id: Long
+-dislike: Integer
++Twin(...)
++GetId():Long
++getDislike():boolean
++setDislike():void
++geyMy():Pic
++geyYours():Pic
+
+}
+
+
+enum State{
+ACTIVE BANNER
+  }
+}
+
+
+package cl.ucn.disc.pictwin.backend.services{
+interface PicTwin{
++create(user: User, password: String): User
++authenticate(email: String, password:String):User
++createTwin(Pic: myPic, user:User): Twin
++dislike(idTwin: Long, idUser: Long): void
+}
+
+entity PicTwinImpl{
+-PASSWORD_ENCODER: PasswordEncode
+
+  }
+}
+
+package cl.ucn.disc.pictwin.backend.web{
+entity BackendApplication{
++Main()
+
+  }
+
+entity PicTwinRestController{
++PicTwinRestController(picTwin: PicTwin)
++Index(): List<Users>
+
+  }
+}
+
+package cl.ucn.disc.pictwin.backend.dao{
+entity DatabaseLoader{
++DatabaseLoader(UserRepository, TwinRepository, PicRepository)
++Run(String...):void
+
+  }
+interface PicRepository{
+
+  }
+interface TwinRepository{
+
+  }
+interface UserRepository{
+
+  }
+}
+
+package org.spingframework.data.repository{
+interface ListCrudRepository{
+
+  }
+interface CrudRepository{
+
+  }
+}
+
+package cl.ucn.disc.pictwin.backend{
+entity Utils{
++printObject(objectName: String, o: Object): void
+}
+
+
+PicTwin ..> User : <<use>>
+PicTwin ..> Twin : <<use>>
+PicTwin ..> Pic : <<use>>
+PicTwinImpl ..|> PicTwin
+BackendApplication ..> PicTwinRestController : <<use>>
+PicTwinRestController --> "1" PicTwin : -picTwin: PicTwin
+
+
+User --> "1" State : - state: State
+User --> "*" Twin : - twins:List<Twins>
+Pic --> "1" User : - owner: User
+
+Twin --> "1" Pic : - my: Pic
+Twin --> "1" Pic : - yours: Pic
+
+DatabaseLoader --> "1" PicTwin : - picTwin: PicTwin
+PicTwinImpl --> "1" PicRepository : - picRepo
+PicTwinImpl --> "1" TwinRepository : - twinRepo
+PicTwinImpl --> "1" UserRepository : - userRepo
+ListCrudRepository --> CrudRepository
+
+PicRepository--|>   ListCrudRepository
+TwinRepository --|> ListCrudRepository
+UserRepository --|> ListCrudRepository
+
+DatabaseLoader ..> Utils : <<use>>
+
+@enduml
